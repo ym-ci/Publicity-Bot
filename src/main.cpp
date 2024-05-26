@@ -25,23 +25,25 @@ pros::MotorGroup right_mg({&front_right_motor, &back_right_motor});
 // Drivetrain Settings
 
 // drivetrain settings
-lemlib::Drivetrain drivetrain(&left_mg, // left motor group
-                              &right_mg, // right motor group
-                              TRACK_WIDTH, // 10 inch track width
-                              WHEEL_DIAMETER, // using new 4" omnis
-                              DRIVETRAIN_RPM, // drivetrain rpm is 360
-                              HORIZONTAL_DRIFT// horizontal drift is 2 (for now)
+lemlib::Drivetrain drivetrain(
+	&left_mg, // left motor group
+    &right_mg, // right motor group
+    TRACK_WIDTH, // 10 inch track width
+    WHEEL_DIAMETER, // using new 4" omnis
+    DRIVETRAIN_RPM, // drivetrain rpm is 360
+    HORIZONTAL_DRIFT// horizontal drift is 2 (for now)
 );
 
 // IMU
-pros::Imu imu_sensor(1);
+// pros::Imu imu_sensor(1);
 
 // Odometry
-lemlib::OdomSensors odom_sensors(nullptr,
-								nullptr,
-  					            nullptr,
-   							    nullptr,
-    							nullptr
+lemlib::OdomSensors odom_sensors(
+	nullptr,
+	nullptr,
+  	nullptr,
+   	nullptr,
+    nullptr
 );
 
 // Chassis
