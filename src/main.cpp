@@ -12,15 +12,15 @@
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 // Motor Ports
-pros::Motor front_left_motor(FRONT_LEFT_MOTOR_PORT, FRONT_LEFT_MOTOR_GEAR); 
+// pros::Motor front_left_motor(FRONT_LEFT_MOTOR_PORT, FRONT_LEFT_MOTOR_GEAR); 
 // pros::Motor middle_left_motor(MIDDLE_LEFT_MOTOR_PORT, MIDDLE_LEFT_MOTOR_GEAR); 
-pros::Motor back_left_motor(BACK_LEFT_MOTOR_PORT, BACK_LEFT_MOTOR_GEAR); 
-pros::Motor front_right_motor(FRONT_RIGHT_MOTOR_PORT, FRONT_RIGHT_MOTOR_GEAR); 
+//pros::Motor back_left_motor(BACK_LEFT_MOTOR_PORT, BACK_LEFT_MOTOR_GEAR); 
+//pros::Motor front_right_motor(FRONT_RIGHT_MOTOR_PORT, FRONT_RIGHT_MOTOR_GEAR); 
 // pros::Motor middle_right_motor(MIDDLE_RIGHT_MOTOR_PORT, MIDDLE_RIGHT_MOTOR_GEAR); 
-pros::Motor back_right_motor(BACK_RIGHT_MOTOR_PORT, BACK_RIGHT_MOTOR_GEAR); 
+// pros::Motor back_right_motor(BACK_RIGHT_MOTOR_PORT, BACK_RIGHT_MOTOR_GEAR); 
 // Drive Motor Group
-pros::MotorGroup left_mg({&front_left_motor, &back_left_motor});
-pros::MotorGroup right_mg({&front_right_motor, &back_right_motor});
+pros::MotorGroup left_mg({-11, -20});
+pros::MotorGroup right_mg({1, 10});
 
 // Drivetrain Settings
 
@@ -138,10 +138,10 @@ void opcontrol() {
 
 		// Print the Analog Joystick values
 		pros::lcd::print(0, "Left Joystick: %d", master.get_analog(ANALOG_LEFT_Y));
-		pros::lcd::print(1, "Right Joystick: %d", master.get_analog(ANALOG_RIGHT_X));
+		pros::lcd::print(1, "Right Joystick: %d", master.get_analog(ANALOG_LEFT_X));
 
 		// Drive the robot
-		chassis.arcade(master.get_analog(ANALOG_LEFT_Y), master.get_analog(ANALOG_RIGHT_X));
+		chassis.arcade(-master.get_analog(ANALOG_LEFT_Y), -master.get_analog(ANALOG_LEFT_X));
 
 		pros::delay(20);                               // Run for 20 ms then update
 	}
