@@ -19,8 +19,8 @@ pros::Controller master(pros::E_CONTROLLER_MASTER);
 // pros::Motor middle_right_motor(MIDDLE_RIGHT_MOTOR_PORT, MIDDLE_RIGHT_MOTOR_GEAR); 
 // pros::Motor back_right_motor(BACK_RIGHT_MOTOR_PORT, BACK_RIGHT_MOTOR_GEAR); 
 // Drive Motor Group
-pros::MotorGroup left_mg({-11, -20});
-pros::MotorGroup right_mg({1, 10});
+pros::MotorGroup left_mg({FRONT_LEFT_MOTOR_PORT, BACK_LEFT_MOTOR_PORT});
+pros::MotorGroup right_mg({FRONT_RIGHT_MOTOR_PORT, BACK_RIGHT_MOTOR_PORT});
 
 // Drivetrain Settings
 
