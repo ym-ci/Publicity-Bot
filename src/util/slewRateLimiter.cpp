@@ -6,12 +6,11 @@ SlewRateLimiter::SlewRateLimiter(float maxChange) : maxChange(maxChange) {
     current = 0.0f;
 }
 
-float SlewRateLimiter::slew(float target, float current) {
+float SlewRateLimiter::slew(float target) {
     // Update the target and current values
     this->target = target;
-    this->current = current;
     // Calculate the change required to reach the target
-    float change = target - current;
+    float change = target - this->current;
     // Limit the change to the maximum allowed change
     if (change > maxChange) {
         change = maxChange;

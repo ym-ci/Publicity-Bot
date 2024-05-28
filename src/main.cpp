@@ -153,28 +153,30 @@ void opcontrol() {
 		//                  (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
 
 		// Move the contoller out to variable
-		double leftJoystick = master.get_analog(ANALOG_LEFT_Y);
-		double rightJoystick = master.get_analog(ANALOG_RIGHT_Y);
+		double throttle = master.get_analog(ANALOG_LEFT_Y);
+		double theta = master.get_analog(ANALOG_LEFT_X) * 0.5;
 
 		// Speed Multiplier
 		double speedMultiplier = speedToggle.getState() ? 0.5 : 1.0;
 
 		// Apply the speed multiplier
-		leftJoystick *= speedMultiplier;
-		rightJoystick *= speedMultiplier;
+		throttle *= speedMultiplier;
+		theta *= speedMultiplier;
 
 		// Artificial acceleration
 		if (accelToggle.getState()) {
-			leftJoystick = accel.slew(leftJoystick, leftJoystick);
-			rightJoystick = accel.slew(rightJoystick, rightJoystick);
+			throttle = accel.slew(throttle);
+			theta = accel.slew(theta);
 		}
 
 		// Print the Analog Joystick values
-		pros::lcd::print(0, "Left Joystick: %d", leftJoystick);
-		pros::lcd::print(1, "Right Joystick: %d", rightJoystick);
+		pros::lcd::print(0, "Left Joystick: %s", std::to_string(throttle).c_str());
+		pros::lcd::print(1, "Right Joystick: %s", std::to_string(theta).c_str());
+		pros::lcd::print(2, "Speed Multiplier: %s", std::to_string(speedMultiplier).c_str());
+		pros::lcd::print(3, "Acceleration: %d", accelToggle.getState());
 		
 		// Drive the robot
-		chassis.arcade(leftJoystick, rightJoystick);
+		chassis.arcade(throttle, theta);
 
 		pros::delay(20);                               // Run for 20 ms then update
 	}

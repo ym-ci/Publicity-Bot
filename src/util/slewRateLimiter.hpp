@@ -9,7 +9,7 @@ private:
     float maxChange;
 public:
     SlewRateLimiter(float maxChange);
-    float slew(float target, float current);
+    float slew(float target);
 };
 
 
