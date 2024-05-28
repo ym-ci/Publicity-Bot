@@ -8,12 +8,12 @@
 #include "pros/motors.hpp"
 
 // Motor Ports
-const int FRONT_LEFT_MOTOR_PORT = -11;
-const int MIDDLE_LEFT_MOTOR_PORT = -2;
-const int BACK_LEFT_MOTOR_PORT = -20;
-const int FRONT_RIGHT_MOTOR_PORT = 1;
-const int MIDDLE_RIGHT_MOTOR_PORT = 5;
-const int BACK_RIGHT_MOTOR_PORT = 10;
+const int FRONT_LEFT_MOTOR_PORT = 11;
+const int MIDDLE_LEFT_MOTOR_PORT = 2;
+const int BACK_LEFT_MOTOR_PORT = 20;
+const int FRONT_RIGHT_MOTOR_PORT = -1;
+const int MIDDLE_RIGHT_MOTOR_PORT = -5;
+const int BACK_RIGHT_MOTOR_PORT = -10;
 
 // Motor Gearing
 const pros::v5::MotorGears FRONT_LEFT_MOTOR_GEAR = pros::v5::MotorGears::green;

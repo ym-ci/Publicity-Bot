@@ -6,6 +6,7 @@
 #include "lemlib/chassis/chassis.hpp"
 #include "pros/abstract_motor.hpp"
 #include "pros/misc.h"
+#include "util/triggerUtil.hpp"
 
 
 // Controller
@@ -54,6 +55,15 @@ lemlib::Chassis chassis(
 	odom_sensors // odom sensors
 );
 
+// Speed Toggle
+Toggle speedToggle;
+
+// Speed Trigger
+Trigger speedTrigger(
+	[]() -> bool { return master.get_digital(DIGITAL_X); },
+	[]() -> void { speedToggle.toggle(); },
+	TriggerMode::RISING_EDGE
+);
 
 
 /**
@@ -136,12 +146,26 @@ void opcontrol() {
 		//                  (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 		//                  (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
 
-		// Print the Analog Joystick values
-		pros::lcd::print(0, "Left Joystick: %d", master.get_analog(ANALOG_LEFT_Y));
-		pros::lcd::print(1, "Right Joystick: %d", master.get_analog(ANALOG_LEFT_X));
+		// Move the contoller out to variable
+		double leftJoystick = master.get_analog(ANALOG_LEFT_Y);
+		double rightJoystick = master.get_analog(ANALOG_RIGHT_Y);
 
+		// Speed Trigger
+		speedTrigger.update();
+		
+		// Speed Multiplier
+		double speedMultiplier = speedToggle.getState() ? 0.5 : 1.0;
+
+		// Apply the speed multiplier
+		leftJoystick *= speedMultiplier;
+		rightJoystick *= speedMultiplier;
+
+		// Print the Analog Joystick values
+		pros::lcd::print(0, "Left Joystick: %d", leftJoystick);
+		pros::lcd::print(1, "Right Joystick: %d", rightJoystick);
+		
 		// Drive the robot
-		chassis.arcade(-master.get_analog(ANALOG_LEFT_Y), -master.get_analog(ANALOG_LEFT_X));
+		chassis.arcade(leftJoystick, rightJoystick);
 
 		pros::delay(20);                               // Run for 20 ms then update
 	}
