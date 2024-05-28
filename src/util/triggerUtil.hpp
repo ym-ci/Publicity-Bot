@@ -27,7 +27,7 @@ public:
 
 class Toggle : public Trigger {
 private:
-    bool state;
+    bool state = false;
 
 public:
     Toggle(std::function<bool()> event, TriggerMode mode);
