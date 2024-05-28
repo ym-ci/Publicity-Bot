@@ -6,66 +6,104 @@
 // Make toggle another class as it is useful elsewhere.
 
 #include <functional>
-
-// Enum for different trigger modes
-enum class TriggerMode {
-    RISING_EDGE,
-    FALLING_EDGE,
-    REPEAT
-};
+#include "triggerUtil.hpp"
 
 // Trigger class that takes two functions as parameters
-class Trigger {
-private:
-    std::function<bool()> event;
-    std::function<void()> action;
-    TriggerMode mode;
-    bool lastEventState;
+// class Trigger {
+// private:
+//     std::function<bool()> event;
+//     std::function<void()> action;
+//     TriggerMode mode;
+//     bool lastEventState;
 
-public:
-    Trigger(std::function<bool()> event, std::function<void()> action, TriggerMode mode) 
-        : event(event), action(action), mode(mode), lastEventState(event()) {}
+// public:
+//     Trigger(std::function<bool()> event, std::function<void()> action, TriggerMode mode) 
+//         : event(event), action(action), mode(mode), lastEventState(event()) {}
 
-    void update() {
-        bool currentEventState = event();
+//     void update() {
+//         bool currentEventState = event();
 
-        switch (mode) {
-            case TriggerMode::RISING_EDGE:
-                if (currentEventState && !lastEventState) {
-                    action();
-                }
-                break;
-            case TriggerMode::FALLING_EDGE:
-                if (!currentEventState && lastEventState) {
-                    action();
-                }
-                break;
-            case TriggerMode::REPEAT:
-                if (currentEventState) {
-                    action();
-                }
-                break;
-        }
+//         switch (mode) {
+//             case TriggerMode::RISING_EDGE:
+//                 if (currentEventState && !lastEventState) {
+//                     action();
+//                 }
+//                 break;
+//             case TriggerMode::FALLING_EDGE:
+//                 if (!currentEventState && lastEventState) {
+//                     action();
+//                 }
+//                 break;
+//             case TriggerMode::REPEAT:
+//                 if (currentEventState) {
+//                     action();
+//                 }
+//                 break;
+//         }
 
-        lastEventState = currentEventState;
+//         lastEventState = currentEventState;
+//     }
+// };
+
+Trigger::Trigger(std::function<bool()> event, std::function<void()> action, TriggerMode mode)
+    : event(event), action(action), mode(mode), lastEventState(event()) {}
+
+void Trigger::update() {
+    bool currentEventState = event();
+
+    switch (mode) {
+        case TriggerMode::RISING_EDGE:
+            if (currentEventState && !lastEventState) {
+                action();
+            }
+            break;
+        case TriggerMode::FALLING_EDGE:
+            if (!currentEventState && lastEventState) {
+                action();
+            }
+            break;
+        case TriggerMode::REPEAT:
+            if (currentEventState) {
+                action();
+            }
+            break;
     }
-};
 
-class Toggle : public Trigger {
-private:
-        bool state;
+    lastEventState = currentEventState;
+}
 
-    public:
-        Toggle(std::function<bool()> event, TriggerMode mode)
-            : Trigger(event, [this]() { toggle(); }, mode), state(false) {}
 
-        bool toggle() {
-            state = !state;
-            return state;
-        }
 
-        bool getState() {
-            update();
-            return state;
-        }
-};
+
+// class Toggle : public Trigger {
+// private:
+//         bool state;
+
+//     public:
+//         Toggle(std::function<bool()> event, TriggerMode mode)
+//             : Trigger(event, [this]() { toggle(); }, mode), state(false) {}
+
+//         bool toggle() {
+//             state = !state;
+//             return state;
+//         }
+
+//         bool getState() {
+//             update();
+//             return state;
+//         }
+// };
+
+Toggle::Toggle(std::function<bool()> event, TriggerMode mode)
+    : Trigger(event, [this]() { toggle(); }, mode), state(false) {}
+
+bool Toggle::toggle() {
+    state = !state;
+    return state;
+}
+
+bool Toggle::getState() {
+    update();
+    return state;
+}
+
