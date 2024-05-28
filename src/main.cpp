@@ -6,6 +6,7 @@
 #include "lemlib/chassis/chassis.hpp"
 #include "pros/abstract_motor.hpp"
 #include "pros/misc.h"
+#include "util/slewRateLimiter.hpp"
 #include "util/triggerUtil.hpp"
 
 
@@ -56,12 +57,17 @@ lemlib::Chassis chassis(
 );
 
 // Speed Toggle
-Toggle speedToggle;
-
-// Speed Trigger
-Trigger speedTrigger(
+Toggle speedToggle(
 	[]() -> bool { return master.get_digital(DIGITAL_X); },
-	[]() -> void { speedToggle.toggle(); },
+	TriggerMode::RISING_EDGE
+);
+
+// Arrtificial acceleration
+SlewRateLimiter accel(0.1);
+
+// Artificial acceleration toggle
+Toggle accelToggle(
+	[]() -> bool { return master.get_digital(DIGITAL_Y); },
 	TriggerMode::RISING_EDGE
 );
 
@@ -150,15 +156,18 @@ void opcontrol() {
 		double leftJoystick = master.get_analog(ANALOG_LEFT_Y);
 		double rightJoystick = master.get_analog(ANALOG_RIGHT_Y);
 
-		// Speed Trigger
-		speedTrigger.update();
-		
 		// Speed Multiplier
 		double speedMultiplier = speedToggle.getState() ? 0.5 : 1.0;
 
 		// Apply the speed multiplier
 		leftJoystick *= speedMultiplier;
 		rightJoystick *= speedMultiplier;
+
+		// Artificial acceleration
+		if (accelToggle.getState()) {
+			leftJoystick = accel.slew(leftJoystick, leftJoystick);
+			rightJoystick = accel.slew(rightJoystick, rightJoystick);
+		}
 
 		// Print the Analog Joystick values
 		pros::lcd::print(0, "Left Joystick: %d", leftJoystick);

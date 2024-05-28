@@ -24,17 +24,18 @@ public:
     void update();
 };
 
-// Toggle class for toggling behavior
-class Toggle {
+
+class Toggle : public Trigger {
 private:
     bool state;
 
 public:
-    Toggle();
+    Toggle(std::function<bool()> event, TriggerMode mode);
 
     bool toggle();
 
     bool getState();
 };
+
 
 #endif // TRIGGER_UTIL_H

@@ -51,20 +51,21 @@ public:
     }
 };
 
-// Toggle class for toggling behavior
-class Toggle {
+class Toggle : public Trigger {
 private:
-    bool state;
+        bool state;
 
-public:
-    Toggle() : state(false) {}
+    public:
+        Toggle(std::function<bool()> event, TriggerMode mode)
+            : Trigger(event, [this]() { toggle(); }, mode), state(false) {}
 
-    bool toggle() {
-        state = !state;
-        return state;
-    }
+        bool toggle() {
+            state = !state;
+            return state;
+        }
 
-    bool getState() {
-        return state;
-    }
+        bool getState() {
+            update();
+            return state;
+        }
 };
