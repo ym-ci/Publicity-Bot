@@ -108,6 +108,10 @@ void initialize() {
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
+
+	// Set Motot Idle Mode
+	right_mg.set_brake_mode(BRAKE_MODE);
+	left_mg.set_brake_mode(BRAKE_MODE);
 }
 
 /**
@@ -217,6 +221,8 @@ void opcontrol() {
 		bool tankDrive = tankDriveToggle.getState();
 		// Print the drive mode to controller
 		master.print(0, 0, "Drive Mode: %s", tankDrive ? "Tank" : "Arcade");
+
+
 
 		// Drive the robot
 		if (tankDrive) {

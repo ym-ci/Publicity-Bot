@@ -29,6 +29,9 @@ const float TRACK_WIDTH = 10;
 const float DRIVETRAIN_RPM = 360;
 const float HORIZONTAL_DRIFT = 2;
 
+// Other Drivetrain Settings
+const pros::motor_brake_mode_e_t BRAKE_MODE = pros::E_MOTOR_BRAKE_BRAKE;
+
 // lateral PID controller
 lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
                                               0, // integral gain (kI)
