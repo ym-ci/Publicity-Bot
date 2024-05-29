@@ -5,7 +5,6 @@
 #include "lemlib/chassis/chassis.hpp"
 #include "lemlib/chassis/trackingWheel.hpp"
 #include "pros/motors.h"
-#include "pros/motors.hpp"
 
 // Motor Ports
 const int FRONT_LEFT_MOTOR_PORT = 11;
@@ -33,7 +32,7 @@ const float HORIZONTAL_DRIFT = 2;
 const pros::motor_brake_mode_e_t BRAKE_MODE = pros::E_MOTOR_BRAKE_BRAKE;
 
 // lateral PID controller
-lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
+const lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
                                               0, // integral gain (kI)
                                               3, // derivative gain (kD)
                                               3, // anti windup
@@ -45,7 +44,7 @@ lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
 );
 
 // angular PID controller
-lemlib::ControllerSettings angular_controller(2, // proportional gain (kP)
+const lemlib::ControllerSettings angular_controller(2, // proportional gain (kP)
                                               0, // integral gain (kI)
                                               10, // derivative gain (kD)
                                               3, // anti windup
