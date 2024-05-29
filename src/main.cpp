@@ -63,11 +63,20 @@ Toggle speedToggle(
 );
 
 // Arrtificial acceleration
-SlewRateLimiter accel(0.1);
+SlewRateLimiter throttleSlew(0.1);
+SlewRateLimiter turnSlew(0.1);
+SlewRateLimiter leftSlew(0.1);
+SlewRateLimiter rightSlew(0.1);
 
 // Artificial acceleration toggle
 Toggle accelToggle(
 	[]() -> bool { return master.get_digital(DIGITAL_Y); },
+	TriggerMode::RISING_EDGE
+);
+
+// Drive Mode
+Toggle tankDriveToggle(
+	[]() -> bool { return master.get_digital(DIGITAL_A); },
 	TriggerMode::RISING_EDGE
 );
 
@@ -132,6 +141,60 @@ void competition_initialize() {}
  */
 void autonomous() {}
 
+void arcade(){
+
+// pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
+	//                  (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
+	//                  (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
+	// Move the contoller out to variable
+	double throttle = master.get_analog(ANALOG_LEFT_Y);
+	double theta = master.get_analog(ANALOG_LEFT_X) * 0.5;
+	// Speed Multiplier
+	double speedMultiplier = speedToggle.getState() ? 0.5 : 1.0;
+	// Apply the speed multiplier
+	throttle *= speedMultiplier;
+	theta *= speedMultiplier;
+	// Artificial acceleration
+	if (accelToggle.getState()) {
+		throttle = throttleSlew.slew(throttle);
+		theta = turnSlew.slew(theta);
+	}
+	// Print the Analog Joystick values
+	pros::lcd::print(0, "Left Joystick: %s", std::to_string(throttle).c_str());
+	pros::lcd::print(1, "Right Joystick: %s", std::to_string(theta).c_str());
+	pros::lcd::print(2, "Speed Multiplier: %s", std::to_string(speedMultiplier).c_str());
+	pros::lcd::print(3, "Acceleration: %d", accelToggle.getState());
+	
+	// Drive the robot
+	chassis.arcade(throttle, theta);
+}
+
+void tank(){
+
+	double left = master.get_analog(ANALOG_LEFT_Y);
+	double right = master.get_analog(ANALOG_RIGHT_Y);
+
+	// Speed Multiplier
+	double speedMultiplier = speedToggle.getState() ? 0.5 : 1.0;
+	// Apply the speed multiplier
+	left *= speedMultiplier;
+	right *= speedMultiplier;
+	// Artificial acceleration
+	if (accelToggle.getState()) {
+		left = leftSlew.slew(left);
+		right = rightSlew.slew(right);
+	}
+
+	// Print the Analog Joystick values
+	pros::lcd::print(0, "Left Joystick: %s", std::to_string(left).c_str());
+	pros::lcd::print(1, "Right Joystick: %s", std::to_string(right).c_str());
+	pros::lcd::print(2, "Speed Multiplier: %s", std::to_string(speedMultiplier).c_str());
+	pros::lcd::print(3, "Acceleration: %d", accelToggle.getState());
+
+	// Drive the robot
+	chassis.tank(left, right);
+}
+
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -148,35 +211,19 @@ void autonomous() {}
 void opcontrol() {
 
 	while (true) {
-		// pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		//                  (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		//                  (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
 
-		// Move the contoller out to variable
-		double throttle = master.get_analog(ANALOG_LEFT_Y);
-		double theta = master.get_analog(ANALOG_LEFT_X) * 0.5;
+		// Check if the robot is in tank drive mode
 
-		// Speed Multiplier
-		double speedMultiplier = speedToggle.getState() ? 0.5 : 1.0;
+		bool tankDrive = tankDriveToggle.getState();
+		// Print the drive mode to controller
+		master.print(0, 0, "Drive Mode: %s", tankDrive ? "Tank" : "Arcade");
 
-		// Apply the speed multiplier
-		throttle *= speedMultiplier;
-		theta *= speedMultiplier;
-
-		// Artificial acceleration
-		if (accelToggle.getState()) {
-			throttle = accel.slew(throttle);
-			theta = accel.slew(theta);
-		}
-
-		// Print the Analog Joystick values
-		pros::lcd::print(0, "Left Joystick: %s", std::to_string(throttle).c_str());
-		pros::lcd::print(1, "Right Joystick: %s", std::to_string(theta).c_str());
-		pros::lcd::print(2, "Speed Multiplier: %s", std::to_string(speedMultiplier).c_str());
-		pros::lcd::print(3, "Acceleration: %d", accelToggle.getState());
-		
 		// Drive the robot
-		chassis.arcade(throttle, theta);
+		if (tankDrive) {
+			tank();
+		} else {
+			arcade();
+		}
 
 		pros::delay(20);                               // Run for 20 ms then update
 	}
