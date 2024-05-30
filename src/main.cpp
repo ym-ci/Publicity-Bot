@@ -6,17 +6,16 @@
 #include "util/slewRateLimiter.hpp"
 #include "util/triggerUtil.hpp"
 
-
 // Controller
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 // Motor Ports
-pros::Motor front_left_motor(FRONT_LEFT_MOTOR_PORT, FRONT_LEFT_MOTOR_GEAR); 
-// pros::Motor middle_left_motor(MIDDLE_LEFT_MOTOR_PORT, MIDDLE_LEFT_MOTOR_GEAR); 
-//pros::Motor back_left_motor(BACK_LEFT_MOTOR_PORT, BACK_LEFT_MOTOR_GEAR); 
-//pros::Motor front_right_motor(FRONT_RIGHT_MOTOR_PORT, FRONT_RIGHT_MOTOR_GEAR); 
-// pros::Motor middle_right_motor(MIDDLE_RIGHT_MOTOR_PORT, MIDDLE_RIGHT_MOTOR_GEAR); 
-// pros::Motor back_right_motor(BACK_RIGHT_MOTOR_PORT, BACK_RIGHT_MOTOR_GEAR); 
+pros::Motor front_left_motor(FRONT_LEFT_MOTOR_PORT, FRONT_LEFT_MOTOR_GEAR);
+// pros::Motor middle_left_motor(MIDDLE_LEFT_MOTOR_PORT, MIDDLE_LEFT_MOTOR_GEAR);
+// pros::Motor back_left_motor(BACK_LEFT_MOTOR_PORT, BACK_LEFT_MOTOR_GEAR);
+// pros::Motor front_right_motor(FRONT_RIGHT_MOTOR_PORT, FRONT_RIGHT_MOTOR_GEAR);
+// pros::Motor middle_right_motor(MIDDLE_RIGHT_MOTOR_PORT, MIDDLE_RIGHT_MOTOR_GEAR);
+// pros::Motor back_right_motor(BACK_RIGHT_MOTOR_PORT, BACK_RIGHT_MOTOR_GEAR);
 // Drive Motor Group
 pros::MotorGroup left_mg({FRONT_LEFT_MOTOR_PORT, BACK_LEFT_MOTOR_PORT});
 pros::MotorGroup right_mg({FRONT_RIGHT_MOTOR_PORT, BACK_RIGHT_MOTOR_PORT});
@@ -25,12 +24,12 @@ pros::MotorGroup right_mg({FRONT_RIGHT_MOTOR_PORT, BACK_RIGHT_MOTOR_PORT});
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(
-	&left_mg, // left motor group
-    &right_mg, // right motor group
-    TRACK_WIDTH, // 10 inch track width
-    WHEEL_DIAMETER, // using new 4" omnis
-    DRIVETRAIN_RPM, // drivetrain rpm is 360
-    HORIZONTAL_DRIFT// horizontal drift is 2 (for now)
+	&left_mg,		 // left motor group
+	&right_mg,		 // right motor group
+	TRACK_WIDTH,	 // 10 inch track width
+	WHEEL_DIAMETER,	 // using new 4" omnis
+	DRIVETRAIN_RPM,	 // drivetrain rpm is 360
+	HORIZONTAL_DRIFT // horizontal drift is 2 (for now)
 );
 
 // IMU
@@ -40,24 +39,23 @@ lemlib::Drivetrain drivetrain(
 lemlib::OdomSensors odom_sensors(
 	nullptr,
 	nullptr,
-  	nullptr,
-   	nullptr,
-    nullptr
-);
+	nullptr,
+	nullptr,
+	nullptr);
 
 // Chassis
 lemlib::Chassis chassis(
-	drivetrain, // drivetrain
+	drivetrain,			// drivetrain
 	lateral_controller, // lateral controller
 	angular_controller, // angular controller
-	odom_sensors // odom sensors
+	odom_sensors		// odom sensors
 );
 
 // Speed Toggle
 Toggle speedToggle(
-	[]() -> bool { return master.get_digital(DIGITAL_X); },
-	TriggerMode::RISING_EDGE
-);
+	[]() -> bool
+	{ return master.get_digital(DIGITAL_X); },
+	TriggerMode::RISING_EDGE);
 
 // Arrtificial acceleration
 SlewRateLimiter throttleSlew(0.1);
@@ -67,16 +65,15 @@ SlewRateLimiter rightSlew(0.1);
 
 // Artificial acceleration toggle
 Toggle accelToggle(
-	[]() -> bool { return master.get_digital(DIGITAL_Y); },
-	TriggerMode::RISING_EDGE
-);
+	[]() -> bool
+	{ return master.get_digital(DIGITAL_Y); },
+	TriggerMode::RISING_EDGE);
 
 // Drive Mode
 Toggle tankDriveToggle(
-	[]() -> bool { return master.get_digital(DIGITAL_A); },
-	TriggerMode::RISING_EDGE
-);
-
+	[]() -> bool
+	{ return master.get_digital(DIGITAL_A); },
+	TriggerMode::RISING_EDGE);
 
 /**
  * A callback function for LLEMU's center button.
@@ -84,12 +81,16 @@ Toggle tankDriveToggle(
  * When this callback is fired, it will toggle line 2 of the LCD text between
  * "I was pressed!" and nothing.
  */
-void on_center_button() {
+void on_center_button()
+{
 	static bool pressed = false;
 	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
+	if (pressed)
+	{
+		pros::lcd::set_text(2, "I'm a little teapot short and st(d)out. Here is my handle here is my spout!");
+	}
+	else
+	{
 		pros::lcd::clear_line(2);
 	}
 }
@@ -100,7 +101,8 @@ void on_center_button() {
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {
+void initialize()
+{
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
 
@@ -142,9 +144,10 @@ void competition_initialize() {}
  */
 void autonomous() {}
 
-void arcade(){
+void arcade()
+{
 
-// pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
+	// pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 	//                  (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 	//                  (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
 	// Move the contoller out to variable
@@ -156,7 +159,8 @@ void arcade(){
 	throttle *= speedMultiplier;
 	theta *= speedMultiplier;
 	// Artificial acceleration
-	if (accelToggle.getState()) {
+	if (accelToggle.getState())
+	{
 		throttle = throttleSlew.slew(throttle);
 		theta = turnSlew.slew(theta);
 	}
@@ -165,12 +169,13 @@ void arcade(){
 	pros::lcd::print(1, "Right Joystick: %s", std::to_string(theta).c_str());
 	pros::lcd::print(2, "Speed Multiplier: %s", std::to_string(speedMultiplier).c_str());
 	pros::lcd::print(3, "Acceleration: %d", accelToggle.getState());
-	
+
 	// Drive the robot
 	chassis.arcade(throttle, theta);
 }
 
-void tank(){
+void tank()
+{
 
 	double left = master.get_analog(ANALOG_LEFT_Y);
 	double right = master.get_analog(ANALOG_RIGHT_Y);
@@ -181,7 +186,8 @@ void tank(){
 	left *= speedMultiplier;
 	right *= speedMultiplier;
 	// Artificial acceleration
-	if (accelToggle.getState()) {
+	if (accelToggle.getState())
+	{
 		left = leftSlew.slew(left);
 		right = rightSlew.slew(right);
 	}
@@ -209,9 +215,11 @@ void tank(){
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {
+void opcontrol()
+{
 
-	while (true) {
+	while (true)
+	{
 
 		// Check if the robot is in tank drive mode
 
@@ -219,15 +227,16 @@ void opcontrol() {
 		// Print the drive mode to controller
 		master.print(0, 0, "Drive Mode: %s", tankDrive ? "Tank" : "Arcade");
 
-
-
 		// Drive the robot
-		if (tankDrive) {
+		if (tankDrive)
+		{
 			tank();
-		} else {
+		}
+		else
+		{
 			arcade();
 		}
 
-		pros::delay(20);                               // Run for 20 ms then update
+		pros::delay(20); // Run for 20 ms then update
 	}
 }
